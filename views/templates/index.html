@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block body %}
+  {% for item in articles %}
+    <section class="post">
+    <header class="entry-header">
+      <h2 class="entry-title"><a target="_blank" href="{{item['link']}}">{{item['title']}}</a></h2>
+      <p class="entry-meta">
+        Posted on <span class="entry-date">{{item['timestamp'].strftime('%Y-%m-%d %H:%M')}}</a> | By <a class="entry-author" href="{{url_for('home_page.filtered', feedName = item['feedName'])}}">{{item['feedName']}}</a>
+      </p>
+    </header>
+    <div class="entry-description">
+  {{item['summary'] | safe}}
+  </div>
+  </section>
+  {% endfor %}
+  <div class="col-sm-12 pagination">
+  <a class="btn btn-default pull-left" href="{{url_for('home_page.index', page = previousPage)}}">Previous</a>
+  <a class="btn btn-default pull-right" href="{{url_for('home_page.index', page = nextPage)}}">Next</a>
+  </div>
+{% endblock %}
+
