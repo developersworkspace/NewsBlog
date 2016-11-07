@@ -1,13 +1,12 @@
-import sqlite3 as lite
+import pymysql
 from newsblog.rssFeeds import DailyMaverick, EWN, CNET, News24, BBC, TechCrunch, TheVerge, SkyNews, FoxNews, MarketWatch, Mashable, LifeHacker
 from time import sleep
 
 while(True):
 
-    connection = lite.connect('../test.db')
-    connection.row_factory = lite.Row
+    connection = pymysql.connect(host='hjlmedicalservicescc.dedicated.co.za', port=3306, user='sadfmcoz_barend', passwd='MidericK96', db='sadfmcoz_dwtest')     
     cursor = connection.cursor()
-
+    
     articles = []
 
     articles = articles + DailyMaverick().getArticles()
@@ -24,16 +23,16 @@ while(True):
     articles = articles + LifeHacker().getArticles()
 
     for article in articles:
-        cursor.execute('SELECT [link] FROM [articles] WHERE [link] = "{0}"'.format(article.link))
+        cursor.execute('SELECT `link` FROM `articles` WHERE `link` = "{0}"'.format(article.link))
         r = cursor.fetchone()
         if (r is None):
             print(article.link)
-            cursor.execute('INSERT INTO [articles] ([feedName], [link], [title], [summary], [timestamp]) VALUES ("{0}", "{1}", "{2}", "{3}", {4})'.format(article.feedName.replace('"',"'"), article.link.replace('"',"'"), article.title.replace('"',"'"), article.summary.replace('"',"'"), article.timestamp.timestamp()))
+            cursor.execute('INSERT INTO articles (`feedName`, `link`, `title`, `summary`, `timestamp`) VALUES ("{0}", "{1}", "{2}", "{3}", "{4}")'.format(article.feedName.replace('"',"'"), article.link.replace('"',"'"), article.title.replace('"',"'"), article.summary.replace('"',"'"), article.timestamp).encode('latin-1', 'ignore'))
 
-    cursor.execute('SELECT COUNT(*) AS [Count] FROM [articles]')
+    cursor.execute('SELECT COUNT(*) AS `Count` FROM `articles`')
     data = cursor.fetchone()
 
-    print('{0} articles in database'.format(data['Count']))
+    print('{0} articles in database'.format(data[0]))
 
     connection.commit()
 

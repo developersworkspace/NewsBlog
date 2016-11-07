@@ -68,7 +68,10 @@ class ExchangeRateRepository(object):
         self.cursor = self.connection.cursor()
 
     def getData(self):
-        sql = "SELECT printf('%s - %s', [fromCurrencyCode], [toCurrencyCode]) AS [exchangeRate], strftime('%Y-%m-%d %H:00',datetime([timestamp], 'unixepoch')) AS [timestamp], round(AVG([rate]), 2) AS [rate] FROM [exchangeRates] WHERE [fromCurrencyCode] = 'ZAR' GROUP BY strftime('%Y-%m-%d %H:00',datetime([timestamp], 'unixepoch')), printf('%s - %s', [fromCurrencyCode], [toCurrencyCode]) ORDER BY [timestamp] ASC"
+
+        groupByFormat = '%Y-%m-%d %H:00'
+
+        sql = "SELECT strftime('{0}',datetime(`timestamp`, 'unixepoch')) AS [timestamp], (SELECT `rate` AS `rate` FROM `exchangeRates` WHERE `timestamp` <= `exchangeRate`.`timestamp` AND `fromCurrencyCode` = 'ZAR' AND `toCurrencyCode` = 'USD' ORDER BY `timestamp` DESC LIMIT 1) AS `ZAR-USD`, (SELECT `rate` AS `rate` FROM `exchangeRates` WHERE `timestamp` <= `exchangeRate`.`timestamp` AND `fromCurrencyCode` = 'ZAR' AND `toCurrencyCode` = 'EUR' ORDER BY `timestamp` DESC LIMIT 1) AS `ZAR-EUR`, (SELECT `rate` AS `rate` FROM `exchangeRates` WHERE `timestamp` <= `exchangeRate`.`timestamp` AND `fromCurrencyCode` = 'ZAR' AND `toCurrencyCode` = 'GBP' ORDER BY `timestamp` DESC LIMIT 1) AS `ZAR-GBP` FROM `exchangeRates` AS `exchangeRate` GROUP BY strftime('{0}',datetime(`timestamp`, 'unixepoch')) ORDER BY `timestamp` ASC".format(groupByFormat)
 
         self.cursor.execute(sql)
 
@@ -80,24 +83,20 @@ class ExchangeRateRepository(object):
         for d in data:
             if (d['timestamp'] not in labels):
                 labels.append(d['timestamp'])
+            
+        sets = ['ZAR-USD', 'ZAR-EUR', 'ZAR-GBP']
 
+        for x in ['ZAR-USD', 'ZAR-EUR', 'ZAR-GBP']:
+            dataSet = {
+                'label': x,
+                'data': [],
+                'radius': 1.5
+            }
+            for d in data:
+                dataSet['data'].append(d[x])
 
-        for d in data:
-            exist = False
-            for dataSet in dataSets:
-                if (dataSet['label'] == d['exchangeRate']):
-                    exist = True
-                    dataSet['data'].append(d['rate'])
-
-            if (exist is False):
-                dataSets.append({
-                    'label': d['exchangeRate'],
-                    'data': [
-                        d['rate']
-                    ],
-                    'fill': False,
-                    #'pointRadius': 0
-                })
+            dataSets.append(dataSet)
+               
         
         return  {
             'labels': labels,

@@ -1,5 +1,5 @@
 from flask import Blueprint, url_for, redirect, request
-from newsblog.repositories import IntegrationRepository
+from newsblog.mysql.repositories import IntegrationRepository
 
 page = Blueprint('integrations_page', __name__, template_folder='templates', static_folder='static')
 
