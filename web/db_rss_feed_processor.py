@@ -23,11 +23,14 @@ while(True):
     articles = articles + LifeHacker().getArticles()
 
     for article in articles:
-        cursor.execute('SELECT `link` FROM `articles` WHERE `link` = "{0}"'.format(article.link))
-        r = cursor.fetchone()
-        if (r is None):
-            print(article.link)
-            cursor.execute('INSERT INTO articles (`feedName`, `link`, `title`, `summary`, `timestamp`) VALUES ("{0}", "{1}", "{2}", "{3}", "{4}")'.format(article.feedName.replace('"',"'"), article.link.replace('"',"'"), article.title.replace('"',"'"), article.summary.replace('"',"'"), article.timestamp).encode('latin-1', 'ignore'))
+        try:
+            cursor.execute('SELECT `link` FROM `articles` WHERE `link` = "{0}"'.format(article.link))
+            r = cursor.fetchone()
+            if (r is None):
+                print(article.link)
+                cursor.execute('INSERT INTO articles (`feedName`, `link`, `title`, `summary`, `timestamp`) VALUES ("{0}", "{1}", "{2}", "{3}", "{4}")'.format(article.feedName.replace('"',"'"), article.link.replace('"',"'"), article.title.replace('"',"'"), article.summary.replace('"',"'"), article.timestamp).encode('latin-1', 'ignore'))
+        except:
+            print('Failed')
 
     cursor.execute('SELECT COUNT(*) AS `Count` FROM `articles`')
     data = cursor.fetchone()
