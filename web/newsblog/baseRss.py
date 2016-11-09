@@ -1,6 +1,7 @@
 import feedparser
 from dateutil import parser
 from newsblog.models import Article
+import datetime
 
 class BaseRss(object):
 
@@ -19,7 +20,12 @@ class BaseRss(object):
         articles = []
 
         for item in self._rss['items']:
-            dt = parser.parse(item['published']).replace(tzinfo=None)
+            dt =  None
+            try:
+                dt = parser.parse(item['published']).replace(tzinfo=None)
+            except:
+                dt = datetime.datetime.now()
+                
             articles.append(Article(self.getTitle(), item['title'], '' if self._ignoreSummary else item['summary'], dt, item['link']))
 
         articles.sort(key=lambda r: r.timestamp, reverse=True)
