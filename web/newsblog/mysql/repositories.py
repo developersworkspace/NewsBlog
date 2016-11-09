@@ -65,11 +65,7 @@ class ExchangeRateRepository(object):
 
     def getData(self):
 
-        groupByFormat = '%m-%d-%Y %H:00'
-
-        sql = "SELECT DATE_FORMAT( `timestamp` , '{0}' ) AS `timestamp` , (SELECT `rate` AS `rate` FROM `exchangeRates` WHERE `timestamp` <= `exchangeRate`.`timestamp` AND `fromCurrencyCode` = 'ZAR' AND `toCurrencyCode` = 'USD' ORDER BY `timestamp` DESC LIMIT 1 ) AS `ZAR-USD` , (SELECT `rate` AS `rate` FROM `exchangeRates` WHERE `timestamp` <= `exchangeRate`.`timestamp` AND `fromCurrencyCode` = 'ZAR' AND `toCurrencyCode` = 'EUR' ORDER BY `timestamp` DESC LIMIT 1 ) AS `ZAR-EUR` , (SELECT `rate` AS `rate` FROM `exchangeRates` WHERE `timestamp` <= `exchangeRate`.`timestamp` AND `fromCurrencyCode` = 'ZAR' AND `toCurrencyCode` = 'GBP' ORDER BY `timestamp` DESC LIMIT 1 ) AS `ZAR-GBP` FROM `exchangeRates` AS `exchangeRate` GROUP BY DATE_FORMAT( `timestamp` , '{0}' ) ORDER BY `timestamp` ASC".format(groupByFormat)
-
-        self.cursor.execute(sql)
+        self.cursor.execute("CALL `GetExchangeRateData`()")
 
         data = self.cursor.fetchall()
         
@@ -83,12 +79,12 @@ class ExchangeRateRepository(object):
 
         for x in [1, 2, 3]:
             dataSet = {
-                'label': x,
+                'label': "ZAR-USD" if x == 1 else ("ZAR-EUR" if x == 2 else "ZAR-GBP"),
                 'data': [],
                 'radius': 1.5
             }
             for d in data:
-                dataSet['data'].append(d[x])
+                dataSet['data'].append(round(d[x], 2))
 
             dataSets.append(dataSet)
                
