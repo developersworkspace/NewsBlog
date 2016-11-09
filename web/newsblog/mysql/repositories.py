@@ -77,14 +77,70 @@ class ExchangeRateRepository(object):
                 labels.append(d[0])
             
 
+        # for x in [1, 2, 3]:
+        #     dataSet = {
+        #         'label': "ZAR-USD" if x == 1 else ("ZAR-EUR" if x == 2 else "ZAR-GBP"),
+        #         'data': [],
+        #         "fill": False,
+        #         "lineTension": 0.1,
+        #         "backgroundColor": "blue" if x == 1 else ("red" if x == 2 else "green"),
+        #         "borderColor": "blue" if x == 1 else ("red" if x == 2 else "green"),
+        #         "borderCapStyle": 'butt',
+        #         "borderDash": [],
+        #         "borderDashOffset": 0.0,
+        #         "borderJoinStyle": 'miter',
+        #         "pointBorderColor": "blue" if x == 1 else ("red" if x == 2 else "green"),
+        #         "pointBackgroundColor": "#fff",
+        #         "pointBorderWidth": 1,
+        #         "pointHoverRadius": 5,
+        #         "pointHoverBackgroundColor": "blue" if x == 1 else ("red" if x == 2 else "green"),
+        #         "pointHoverBorderColor": "blue" if x == 1 else ("red" if x == 2 else "green"),
+        #         "pointHoverBorderWidth": 2,
+        #         "pointRadius": 1,
+        #         "pointHitRadius": 10,
+        #         "spanGaps": False,
+        #     }
+
+        #     for d in data:
+        #         dataSet['data'].append(round(d[x], 2))
+
+        #     dataSets.append(dataSet)
+
+
+
+
+
         for x in [1, 2, 3]:
             dataSet = {
                 'label': "ZAR-USD" if x == 1 else ("ZAR-EUR" if x == 2 else "ZAR-GBP"),
-                'data': [],
-                'radius': 1.5
+                'data': [ None ],
+                "fill": False,
+                "lineTension": 0.1,
+                "backgroundColor": "blue" if x == 1 else ("red" if x == 2 else "green"),
+                "borderColor": "blue" if x == 1 else ("red" if x == 2 else "green"),
+                "borderCapStyle": 'butt',
+                "borderDash": [],
+                "borderDashOffset": 0.0,
+                "borderJoinStyle": 'miter',
+                "pointBorderColor": "blue" if x == 1 else ("red" if x == 2 else "green"),
+                "pointBackgroundColor": "#fff",
+                "pointBorderWidth": 1,
+                "pointHoverRadius": 5,
+                "pointHoverBackgroundColor": "blue" if x == 1 else ("red" if x == 2 else "green"),
+                "pointHoverBorderColor": "blue" if x == 1 else ("red" if x == 2 else "green"),
+                "pointHoverBorderWidth": 2,
+                "pointRadius": 1,
+                "pointHitRadius": 10,
+                "spanGaps": False,
             }
-            for d in data:
-                dataSet['data'].append(round(d[x], 2))
+            
+            prevValue = data[0][x]
+
+            for i in range(1, len(data)):
+                value = data[i]
+                growth = ((value[x] - prevValue) / prevValue) * 100
+                dataSet['data'].append(round(growth, 2))
+                prevValue = value[x]
 
             dataSets.append(dataSet)
                
