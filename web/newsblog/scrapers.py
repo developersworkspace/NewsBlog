@@ -9,28 +9,30 @@ class XECom(object):
         return response.content
 
     def getExchangeRates(self):
+        try:
+            soup = BeautifulSoup(self.getPageSource(), "html.parser")
 
-        soup = BeautifulSoup(self.getPageSource(), "html.parser")
+            cells = soup.find_all('td', { 'class': 'rateCell'})
 
-        cells = soup.find_all('td', { 'class': 'rateCell'})
+            results = {}
 
-        results = {}
+            for cell in cells:
 
-        for cell in cells:
+                value = cell.find('a').decode_contents(formatter="html") if cell.find('a') else None
+                if (value is None):
+                    continue
 
-            value = cell.find('a').decode_contents(formatter="html") if cell.find('a') else None
-            if (value is None):
-                continue
+                data = cell.find('a')['rel'][0]
+                fromCurrency = data.split(',')[0]
+                toCurrency = data.split(',')[1]
+                
+                if (fromCurrency not in results):
+                    results[fromCurrency] = {}
 
-            data = cell.find('a')['rel'][0]
-            fromCurrency = data.split(',')[0]
-            toCurrency = data.split(',')[1]
-            
-            if (fromCurrency not in results):
-                results[fromCurrency] = {}
+                results[fromCurrency][toCurrency] = value
 
-            results[fromCurrency][toCurrency] = value
-
-        return results
+            return results
+        except:
+            return None
 
 

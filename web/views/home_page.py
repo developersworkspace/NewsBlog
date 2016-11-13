@@ -8,8 +8,9 @@ page = Blueprint('home_page', __name__, template_folder='templates', static_fold
 def index(page):
     
     articles = ArticleRepository().findArticlesFiltered(None, page)
+    articlesCount = ArticleRepository().countArticles();
 
-    return render_template('index.html', articles = articles, currentPage = page, nextPage = page + 1, previousPage = page - 1)
+    return render_template('index.html', articles = articles, currentPage = page, nextPage = page + 1, previousPage = page - 1, articlesCount = articlesCount)
 
 @page.route('/filtered/<feedName>', defaults={'page': 1})
 @page.route('/filtered/<feedName>/<int:page>')

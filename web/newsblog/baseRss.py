@@ -16,19 +16,20 @@ class BaseRss(object):
         return feedparser.parse(self._url)
 
     def getArticles(self):
-
         articles = []
 
         for item in self._rss['items']:
-            dt =  None
             try:
+                dt =  None
                 dt = parser.parse(item['published']).replace(tzinfo=None)
-            except:
                 dt = datetime.datetime.now()
                 
-            articles.append(Article(self.getTitle(), item['title'], '' if self._ignoreSummary else item['summary'], dt, item['link']))
+                articles.append(Article(self.getTitle(), item['title'], '' if self._ignoreSummary else item['summary'], dt, item['link']))
+            except:
+                pass
 
         articles.sort(key=lambda r: r.timestamp, reverse=True)
+
         return articles
 
     def getTitle(self):

@@ -13,6 +13,7 @@
   </div>
   </section>
   {% endfor %}
+  <h5 class="text-center">Over {{articlesCount}} articles</p>
   <div class="col-sm-12 pagination">
   <a class="btn btn-default pull-left" href="{{url_for('home_page.index', page = previousPage)}}">Previous</a>
   <a class="btn btn-default pull-right" href="{{url_for('home_page.index', page = nextPage)}}">Next</a>

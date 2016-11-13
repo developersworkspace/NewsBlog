@@ -23,6 +23,13 @@ class ArticleRepository(object):
             result.append(Article(article[0], article[1], article[2], datetime.datetime.fromtimestamp(article[3]), article[4]))
 
         return result
+    
+    def countArticles(self):
+        self.cursor.execute('SELECT COUNT(*) AS `Count` FROM `articles`')
+
+        data = self.cursor.fetchone()
+
+        return data[0]
 
     def findArticlesFiltered(self, feedName, page):
 
